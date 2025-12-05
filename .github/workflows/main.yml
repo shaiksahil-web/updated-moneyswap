@@ -1,0 +1,54 @@
+name: Build and Push Frontend & Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  backend:
+    name: Build & Push Backend
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build backend image
+      run: |
+        cd cashswap-backend
+        docker build -t shaiksahil123/updatedmoneyswapbackend:latest .
+
+    - name: Push backend image
+      run: |
+        docker push shaiksahil123/updatedmoneyswapbackend:latest
+
+  frontend:
+    name: Build & Push Frontend
+    runs-on: ubuntu-latest
+    needs: backend
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build frontend image
+      run: |
+        cd cashswap-frontend
+        docker build -t shaiksahil123/updatedmoneyswapfrontend:latest .
+
+    - name: Push frontend image
+      run: |
+        docker push shaiksahil123/updatedmoneyswapfrontend:latest
